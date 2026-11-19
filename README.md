@@ -4,7 +4,7 @@ Documentation of completed PostgreSQL exercises from [pgexercises.com](https://p
 
 ---
 
-## 📌 Completed Section: Simple SQL Queries (12 / 12) ✅
+## 📌 1. Simple SQL Queries (12 / 12) ✅
 
 | # | Exercise | Core Concept | Status |
 |:---:|:---|:---|:---:|
@@ -21,99 +21,58 @@ Documentation of completed PostgreSQL exercises from [pgexercises.com](https://p
 | 11 | **Simple aggregation** | Aggregation using `MAX()` | ✅ Completed |
 | 12 | **More aggregation** | Subqueries in filtering (`WHERE col = (SELECT MAX(...))`) | ✅ Completed |
 
+📄 *All SQL queries for this section:* [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql)
+
 ---
 
-## 💻 Query Solutions & Notes
+## 📌 2. Joins and Subqueries (3 Completed) 🔄
 
-All SQL queries for this section are maintained in [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql):
+| # | Exercise | Core Concept | Status |
+|:---:|:---|:---|:---:|
+| 1 | **Retrieve the start times of members' bookings** | Multi-table `INNER JOIN` with table aliases and composite `WHERE` | ✅ Completed |
+| 2 | **Work out the start times of bookings for tennis courts** | `INNER JOIN` with date-range boundary filtering and `ORDER BY` | ✅ Completed |
+| 3 | **Produce a list of all members who have recommended another member** | Self `JOIN` on hierarchical relation with `DISTINCT` deduplication | ✅ Completed |
+| 4 | Produce a list of all members, along with their recommender | Outer joins (`LEFT JOIN`) | ⚪ Pending |
+| 5 | Produce a list of all members who have used a tennis court | Multi-table join across 3 tables | ⚪ Pending |
+| 6 | Produce a list of costly bookings | Calculated expressions across joins | ⚪ Pending |
+| 7 | Produce a list of all members, along with their recommender, using no joins | Correlated subqueries in `SELECT` list | ⚪ Pending |
+| 8 | Produce a list of costly bookings, using a subquery | CTE / Subquery in `FROM` clause | ⚪ Pending |
 
-### 1. Retrieve everything from a table
+📄 *All SQL queries for this section:* [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql)
+
+---
+
+## 💻 Query Solutions & Notes: Joins and Subqueries
+
+### 1. Retrieve the start times of members' bookings
 ```sql
-SELECT * 
-FROM cd.facilities;
+SELECT bks.starttime
+FROM cd.bookings bks
+INNER JOIN cd.members mems
+    ON mems.memid = bks.memid
+WHERE mems.firstname = 'David'
+  AND mems.surname = 'Farrell';
 ```
 
-### 2. Retrieve specific columns from a table
+### 2. Work out the start times of bookings for tennis courts
 ```sql
-SELECT name, membercost 
-FROM cd.facilities;
+SELECT bks.starttime AS start, 
+       facs.name AS name
+FROM cd.bookings bks
+INNER JOIN cd.facilities facs
+    ON facs.facid = bks.facid
+WHERE facs.name LIKE 'Tennis Court%'
+  AND bks.starttime >= '2012-09-21'
+  AND bks.starttime < '2012-09-22'
+ORDER BY bks.starttime;
 ```
 
-### 3. Control which rows are retrieved
+### 3. Produce a list of all members who have recommended another member
 ```sql
-SELECT * 
-FROM cd.facilities 
-WHERE membercost > 0;
-```
-
-### 4. Control which rows are retrieved - part 2
-```sql
-SELECT facid, name, membercost, monthlymaintenance 
-FROM cd.facilities 
-WHERE membercost > 0 
-  AND (membercost < monthlymaintenance / 50.0);
-```
-
-### 5. Basic string searches
-```sql
-SELECT * 
-FROM cd.facilities 
-WHERE name LIKE '%Tennis%';
-```
-
-### 6. Matching against multiple possible values
-```sql
-SELECT * 
-FROM cd.facilities 
-WHERE facid IN (1, 5);
-```
-
-### 7. Classify results into buckets
-```sql
-SELECT name, 
-       CASE 
-           WHEN monthlymaintenance > 100 THEN 'expensive'
-           ELSE 'cheap'
-       END AS cost
-FROM cd.facilities;
-```
-
-### 8. Working with dates
-```sql
-SELECT memid, surname, firstname, joindate 
-FROM cd.members 
-WHERE joindate >= '2012-09-01';
-```
-
-### 9. Removing duplicates, and ordering results
-```sql
-SELECT DISTINCT surname 
-FROM cd.members 
-ORDER BY surname 
-LIMIT 10;
-```
-
-### 10. Combining results from multiple queries
-```sql
-SELECT surname 
-FROM cd.members 
-UNION 
-SELECT name 
-FROM cd.facilities;
-```
-
-### 11. Simple aggregation
-```sql
-SELECT MAX(joindate) AS latest 
-FROM cd.members;
-```
-
-### 12. More aggregation
-```sql
-SELECT firstname, surname, joindate 
-FROM cd.members 
-WHERE joindate = (
-    SELECT MAX(joindate) 
-    FROM cd.members
-);
+SELECT DISTINCT recs.firstname, 
+       recs.surname
+FROM cd.members mems
+INNER JOIN cd.members recs
+    ON recs.memid = mems.recommendedby
+ORDER BY surname, firstname;
 ```
