@@ -1,6 +1,6 @@
 # 🎯 Road to Data Analyst: SQL Portfolio & Learning Log
 
-A hands-on PostgreSQL repository documenting practical SQL proficiency—from foundational queries to multi-table joins, conditional logic, and subqueries—practiced on [PostgreSQL Exercises (pgexercises.com)](https://pgexercises.com) as preparation for real-world e-commerce analytics.
+A hands-on PostgreSQL repository documenting practical SQL proficiency—from foundational queries to multi-table joins, subqueries, and aggregations with `GROUP BY`—practiced on [PostgreSQL Exercises (pgexercises.com)](https://pgexercises.com) as preparation for real-world e-commerce analytics.
 
 ---
 
@@ -10,55 +10,83 @@ A hands-on PostgreSQL repository documenting practical SQL proficiency—from fo
 |:---|:---:|:---:|:---|
 | **1. Simple SQL Queries** | 12 / 12 | ✅ 100% Completed | `SELECT`, `WHERE`, `LIKE`, `IN`, `CASE WHEN`, `DISTINCT`, `ORDER BY`, `UNION`, `MAX()` |
 | **2. Joins & Subqueries** | 8 / 8 | ✅ 100% Completed | `INNER JOIN`, `LEFT JOIN`, Self `JOIN`, 3-Table Joins, Correlated Subqueries, Derived Tables |
-| **3. Aggregates & Grouping** | — | 🔄 Up Next | `COUNT`, `SUM`, `AVG`, `GROUP BY`, `HAVING`, Window Functions |
-| **4. Database Design & Loading** | — | ⚪ Upcoming | PostgreSQL Schema, DDL constraints, Kaggle Olist Dataset ingestion |
+| **3. Aggregation** | 4 Completed | 🔄 In Progress | `COUNT(*)`, `SUM()`, `WHERE` with Aggregates, `GROUP BY`, `ORDER BY` |
+| **4. Database Design & Loading** | — | ⚪ Next Milestone | PostgreSQL Schema, DDL constraints, Kaggle Olist Dataset ingestion |
 
 ---
 
-## 💡 Practical SQL Examples & Code Snippets
+## 📌 Completed Section Details
 
-Here are key examples showcasing the core techniques practiced and mastered:
+### 1. Simple SQL Queries (12 / 12) ✅
+*Source file:* [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql)
+- Full table scans (`SELECT *`) & projection
+- Predicate filtering (`WHERE`, compound `AND`, numeric logic)
+- Pattern matching (`LIKE '%Tennis%'`) & set inclusions (`IN (1, 5)`)
+- Conditional buckets (`CASE WHEN`)
+- Date filtering (`joindate >= '2012-09-01'`)
+- Deduplication and slicing (`DISTINCT`, `ORDER BY`, `LIMIT`)
+- Set combination (`UNION`) and scalar aggregate subqueries
 
-### 1. Basic Filtering & Compound Conditions
-Filtering data with numeric logic and multiple constraints:
+### 2. Joins & Subqueries (8 / 8) ✅
+*Source file:* [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql)
+- Multi-table `INNER JOIN` across bookings, members, and facilities
+- Date range boundary matching on joined records
+- Self `JOIN` on hierarchical referral chains
+- `LEFT OUTER JOIN` handling `NULL` values for unmatched rows
+- Complex multi-table joins with conditional pricing logic (`CASE WHEN`)
+- Scalar correlated subqueries in `SELECT`
+- Inline derived tables / subqueries in `FROM` clause to avoid code duplication
+
+### 3. Aggregation (4 Completed) 🔄
+*Source file:* [`sql/aggregation.sql`](file:///c:/Users/Test/Desktop/sql/sql/aggregation.sql)
+
+| # | Exercise | User's Core Query | Core Concept | Status |
+|:---:|:---|:---|:---|:---:|
+| 1 | **Count the number of facilities** | `SELECT count(*) AS Total_facilities FROM cd.facilities;` | Basic `COUNT(*)` aggregation | ✅ Completed |
+| 2 | **Count the number of expensive facilities** | `SELECT count(*) AS number_facilities FROM cd.facilities WHERE guestcost >= 10;` | Filtered aggregate with `WHERE` | ✅ Completed |
+| 3 | **Count the number of recommendations each member makes** | `SELECT recommendedby, count(*) FROM cd.members WHERE recommendedby IS NOT NULL GROUP BY recommendedby ORDER BY recommendedby;` | Grouped aggregation (`GROUP BY`) | ✅ Completed |
+| 4 | **List the total slots booked per facility** | `SELECT facid, SUM(slots) AS Total_slots FROM cd.bookings GROUP BY facid ORDER BY facid;` | `SUM()` aggregate over groups | ✅ Completed |
+
+---
+
+## 💡 Practical SQL Highlights & Code Examples
+
+### 1. Counting with Constraints
 ```sql
--- Retrieve facilities that charge a fee less than 1/50th of monthly maintenance
-SELECT facid, name, membercost, monthlymaintenance 
-FROM cd.facilities 
-WHERE membercost > 0 
-  AND (membercost < monthlymaintenance / 50.0);
+-- Count facilities with guestcost of 10 or more
+SELECT count(*) AS number_facilities
+FROM cd.facilities
+WHERE guestcost >= 10;
 ```
 
 ---
 
-### 2. Segmenting Data with `CASE WHEN`
-Creating conditional label columns for business categorization:
+### 2. Grouped Aggregation (`GROUP BY`)
 ```sql
--- Classify facilities into 'cheap' vs 'expensive' cost buckets
-SELECT name, 
-       CASE 
-           WHEN monthlymaintenance > 100 THEN 'expensive'
-           ELSE 'cheap'
-       END AS cost_category
-FROM cd.facilities;
+-- Count recommendations made by each member, excluding nulls
+SELECT recommendedby,
+       count(*)
+FROM cd.members
+WHERE recommendedby IS NOT NULL
+GROUP BY recommendedby
+ORDER BY recommendedby;
 ```
 
 ---
 
-### 3. Date Filtering, Deduplication & Ranking
-Working with timestamp data, sorting, and slicing top records:
+### 3. Summing Quantities Across Groups
 ```sql
--- Get top 10 unique member surnames in alphabetical order
-SELECT DISTINCT surname 
-FROM cd.members 
-ORDER BY surname 
-LIMIT 10;
+-- Total slots booked per facility, sorted by facility id
+SELECT facid,
+       SUM(slots) AS Total_slots
+FROM cd.bookings
+GROUP BY facid
+ORDER BY facid;
 ```
 
 ---
 
 ### 4. Multi-Table `INNER JOIN`
-Combining related entities (members and bookings) to answer specific questions:
 ```sql
 -- Find start times for all bookings made by 'David Farrell'
 SELECT bks.starttime
@@ -71,8 +99,7 @@ WHERE mems.firstname = 'David'
 
 ---
 
-### 5. Self `JOIN` (Parent-Child / Hierarchical Data)
-Joining a table to itself to resolve relationship hierarchies:
+### 5. Self `JOIN` (Hierarchical Relationships)
 ```sql
 -- Output distinct members who have recommended another member
 SELECT DISTINCT recs.firstname, 
@@ -86,7 +113,6 @@ ORDER BY surname, firstname;
 ---
 
 ### 6. `LEFT OUTER JOIN` (Preserving Unmatched Records)
-Ensuring all primary records appear even if matching foreign records do not exist (`NULL` handling):
 ```sql
 -- List all members along with their recommender (including members with no recommender)
 SELECT mems.firstname AS member_firstname, 
@@ -102,7 +128,6 @@ ORDER BY member_surname, member_firstname;
 ---
 
 ### 7. Derived Tables & Subqueries
-Wrapping complex calculations into an inline subquery in the `FROM` clause to avoid duplicating logic:
 ```sql
 -- Filter bookings exceeding $30 without repeating the cost formula
 SELECT member, facility, cost
@@ -129,11 +154,12 @@ ORDER BY cost DESC;
 
 ## 📁 Source Code Files
 
-- 📄 [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql) — Complete set of 12 basic SQL solutions.
-- 📄 [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql) — Complete set of 8 multi-table join and subquery solutions.
+- 📄 [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql) — 12 foundational SQL solutions.
+- 📄 [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql) — 8 multi-table join and subquery solutions.
+- 📄 [`sql/aggregation.sql`](file:///c:/Users/Test/Desktop/sql/sql/aggregation.sql) — Solutions for Aggregates & Grouping.
 
 ---
 
 ## 📌 Next Milestone
-- [ ] Practice **Aggregates** on pgexercises (`COUNT`, `SUM`, `AVG`, `GROUP BY`, `HAVING`).
-- [ ] Move to **Database Design & Data Loading** (PostgreSQL schema creation and Olist E-Commerce dataset loading).
+- [ ] Complete remaining exercises in **Aggregation** on pgexercises.com.
+- [ ] Transition to **Database Design & Data Loading** (PostgreSQL schema setup & loading Kaggle Olist E-Commerce dataset).
