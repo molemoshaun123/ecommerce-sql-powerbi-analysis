@@ -1,58 +1,25 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# Large Dataset Files (Olist CSVs & Archives)
+data/*.csv
+data/*.zip
+*.csv
+*.zip
 
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-
-# Environment variables & secrets
+# Environment & Secrets
 .env
 .env.*
 *.secret
 
-# IDE and OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-.vscode/
-.idea/
+# Python & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+venv/
+.venv/
 
-# Large Dataset Files (Olist CSVs)
-# Dataset should be downloaded directly from Kaggle into /data
-data/*.csv
-data/*.zip
-data/*.tar.gz
-data/*.parquet
-
-# Temporary Power BI files
+# Power BI & OS Temporary Files
 *.tmp
 ~$*.pbix
+.DS_Store
+Thumbs.db
