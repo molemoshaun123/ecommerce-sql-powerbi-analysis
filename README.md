@@ -1,54 +1,139 @@
-# 🎯 Road to Data Analyst: SQL Learning Log
+# 🎯 Road to Data Analyst: SQL Portfolio & Learning Log
 
-Documentation of completed PostgreSQL exercises from [pgexercises.com](https://pgexercises.com) preparing for the End-to-End E-Commerce Data Analytics Project.
-
----
-
-## 📌 1. Simple SQL Queries (12 / 12) ✅
-
-| # | Exercise | Core Concept | Status |
-|:---:|:---|:---|:---:|
-| 1 | **Retrieve everything from a table** | `SELECT *` wildcard full-table scan | ✅ Completed |
-| 2 | **Retrieve specific columns from a table** | Column selection / projection | ✅ Completed |
-| 3 | **Control which rows are retrieved** | Row filtering with `WHERE` and comparison operators (`>`) | ✅ Completed |
-| 4 | **Control which rows are retrieved - part 2** | Compound conditions (`AND`) and calculated comparisons | ✅ Completed |
-| 5 | **Basic string searches** | Pattern matching with `LIKE '%...%'` | ✅ Completed |
-| 6 | **Matching against multiple possible values** | Set membership filtering using `IN (...)` | ✅ Completed |
-| 7 | **Classify results into buckets** | Conditional logic with `CASE WHEN ... THEN ... ELSE ... END` | ✅ Completed |
-| 8 | **Working with dates** | Date / Timestamp comparison filtering (`>= '2012-09-01'`) | ✅ Completed |
-| 9 | **Removing duplicates, and ordering results** | Deduplication (`DISTINCT`), sorting (`ORDER BY`), and slicing (`LIMIT`) | ✅ Completed |
-| 10 | **Combining results from multiple queries** | Result set combination with `UNION` | ✅ Completed |
-| 11 | **Simple aggregation** | Aggregation using `MAX()` | ✅ Completed |
-| 12 | **More aggregation** | Subqueries in filtering (`WHERE col = (SELECT MAX(...))`) | ✅ Completed |
-
-📄 *All SQL queries for this section:* [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql)
+A hands-on PostgreSQL repository documenting practical SQL proficiency—from foundational queries to multi-table joins, conditional logic, and subqueries—practiced on [PostgreSQL Exercises (pgexercises.com)](https://pgexercises.com) as preparation for real-world e-commerce analytics.
 
 ---
 
-## 📌 2. Joins and Subqueries (8 / 8) ✅
+## 📊 Completed Milestones
 
-| # | Exercise | Core Concept | Status |
-|:---:|:---|:---|:---:|
-| 1 | **Retrieve the start times of members' bookings** | Multi-table `INNER JOIN` with table aliases and composite `WHERE` | ✅ Completed |
-| 2 | **Work out the start times of bookings for tennis courts** | `INNER JOIN` with date-range boundary filtering and `ORDER BY` | ✅ Completed |
-| 3 | **Produce a list of all members who have recommended another member** | Self `JOIN` on hierarchical relation with `DISTINCT` deduplication | ✅ Completed |
-| 4 | **Produce a list of all members, along with their recommender** | `LEFT OUTER JOIN` to preserve unmatched records and handle `NULL`s | ✅ Completed |
-| 5 | **Produce a list of all members who have used a tennis court** | Multi-table join across 3 tables (`members` ⨝ `bookings` ⨝ `facilities`) | ✅ Completed |
-| 6 | **Produce a list of costly bookings** | Multi-table join with dynamic calculations and conditional `CASE WHEN` | ✅ Completed |
-| 7 | **Produce a list of all members, along with their recommender, using no joins** | Scalar correlated subquery in `SELECT` projection list | ✅ Completed |
-| 8 | **Produce a list of costly bookings, using a subquery** | Derived table / Inline subquery in `FROM` clause to avoid DRY duplication | ✅ Completed |
-
-📄 *All SQL queries for this section:* [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql)
+| Topic Area | Total Exercises | Status | Core Skills Mastered |
+|:---|:---:|:---:|:---|
+| **1. Simple SQL Queries** | 12 / 12 | ✅ 100% Completed | `SELECT`, `WHERE`, `LIKE`, `IN`, `CASE WHEN`, `DISTINCT`, `ORDER BY`, `UNION`, `MAX()` |
+| **2. Joins & Subqueries** | 8 / 8 | ✅ 100% Completed | `INNER JOIN`, `LEFT JOIN`, Self `JOIN`, 3-Table Joins, Correlated Subqueries, Derived Tables |
+| **3. Aggregates & Grouping** | — | 🔄 Up Next | `COUNT`, `SUM`, `AVG`, `GROUP BY`, `HAVING`, Window Functions |
+| **4. Database Design & Loading** | — | ⚪ Upcoming | PostgreSQL Schema, DDL constraints, Kaggle Olist Dataset ingestion |
 
 ---
 
-## 🚀 Next Steps in Roadmap
+## 💡 Practical SQL Examples & Code Snippets
 
-1. **Aggregates Section** *(Up Next on pgexercises.com)*:
-   - `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`
-   - `GROUP BY` and `HAVING` clauses
-   - Nested aggregations & window function foundations
-2. **Database Design & Data Loading**:
-   - Create `olist_ecommerce` PostgreSQL database
-   - Relational DDL schema setup with primary/foreign keys
-   - Ingesting Olist Brazilian E-Commerce dataset CSVs via `\copy`
+Here are key examples showcasing the core techniques practiced and mastered:
+
+### 1. Basic Filtering & Compound Conditions
+Filtering data with numeric logic and multiple constraints:
+```sql
+-- Retrieve facilities that charge a fee less than 1/50th of monthly maintenance
+SELECT facid, name, membercost, monthlymaintenance 
+FROM cd.facilities 
+WHERE membercost > 0 
+  AND (membercost < monthlymaintenance / 50.0);
+```
+
+---
+
+### 2. Segmenting Data with `CASE WHEN`
+Creating conditional label columns for business categorization:
+```sql
+-- Classify facilities into 'cheap' vs 'expensive' cost buckets
+SELECT name, 
+       CASE 
+           WHEN monthlymaintenance > 100 THEN 'expensive'
+           ELSE 'cheap'
+       END AS cost_category
+FROM cd.facilities;
+```
+
+---
+
+### 3. Date Filtering, Deduplication & Ranking
+Working with timestamp data, sorting, and slicing top records:
+```sql
+-- Get top 10 unique member surnames in alphabetical order
+SELECT DISTINCT surname 
+FROM cd.members 
+ORDER BY surname 
+LIMIT 10;
+```
+
+---
+
+### 4. Multi-Table `INNER JOIN`
+Combining related entities (members and bookings) to answer specific questions:
+```sql
+-- Find start times for all bookings made by 'David Farrell'
+SELECT bks.starttime
+FROM cd.bookings bks
+INNER JOIN cd.members mems
+    ON mems.memid = bks.memid
+WHERE mems.firstname = 'David'
+  AND mems.surname = 'Farrell';
+```
+
+---
+
+### 5. Self `JOIN` (Parent-Child / Hierarchical Data)
+Joining a table to itself to resolve relationship hierarchies:
+```sql
+-- Output distinct members who have recommended another member
+SELECT DISTINCT recs.firstname, 
+       recs.surname
+FROM cd.members mems
+INNER JOIN cd.members recs
+    ON recs.memid = mems.recommendedby
+ORDER BY surname, firstname;
+```
+
+---
+
+### 6. `LEFT OUTER JOIN` (Preserving Unmatched Records)
+Ensuring all primary records appear even if matching foreign records do not exist (`NULL` handling):
+```sql
+-- List all members along with their recommender (including members with no recommender)
+SELECT mems.firstname AS member_firstname, 
+       mems.surname   AS member_surname, 
+       recs.firstname AS recommender_firstname, 
+       recs.surname   AS recommender_surname
+FROM cd.members mems
+LEFT OUTER JOIN cd.members recs
+    ON recs.memid = mems.recommendedby
+ORDER BY member_surname, member_firstname;
+```
+
+---
+
+### 7. Derived Tables & Subqueries
+Wrapping complex calculations into an inline subquery in the `FROM` clause to avoid duplicating logic:
+```sql
+-- Filter bookings exceeding $30 without repeating the cost formula
+SELECT member, facility, cost
+FROM (
+    SELECT mems.firstname || ' ' || mems.surname AS member,
+           facs.name AS facility,
+           CASE 
+               WHEN mems.memid = 0 THEN bks.slots * facs.guestcost
+               ELSE bks.slots * facs.membercost
+           END AS cost
+    FROM cd.members mems
+    INNER JOIN cd.bookings bks
+        ON mems.memid = bks.memid
+    INNER JOIN cd.facilities facs
+        ON bks.facid = facs.facid
+    WHERE bks.starttime >= '2012-09-14'
+      AND bks.starttime < '2012-09-15'
+) AS subquery
+WHERE cost > 30
+ORDER BY cost DESC;
+```
+
+---
+
+## 📁 Source Code Files
+
+- 📄 [`sql/simple_sql_queries.sql`](file:///c:/Users/Test/Desktop/sql/sql/simple_sql_queries.sql) — Complete set of 12 basic SQL solutions.
+- 📄 [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql) — Complete set of 8 multi-table join and subquery solutions.
+
+---
+
+## 📌 Next Milestone
+- [ ] Practice **Aggregates** on pgexercises (`COUNT`, `SUM`, `AVG`, `GROUP BY`, `HAVING`).
+- [ ] Move to **Database Design & Data Loading** (PostgreSQL schema creation and Olist E-Commerce dataset loading).
