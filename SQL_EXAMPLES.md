@@ -7,7 +7,7 @@ This document compiles all SQL practice examples completed on [PostgreSQL Exerci
 ## 📑 Table of Contents
 1. [Simple SQL Queries (12 Examples)](#1-simple-sql-queries)
 2. [Joins and Subqueries (8 Examples)](#2-joins-and-subqueries)
-3. [Aggregation (4 Examples)](#3-aggregation)
+3. [Aggregation (9 Examples)](#3-aggregation)
 
 ---
 
@@ -254,4 +254,53 @@ SELECT facid,
 FROM cd.bookings
 GROUP BY facid
 ORDER BY facid;
+```
+
+### Example 25: Total slots booked per facility in a given month
+```sql
+SELECT facid, 
+       SUM(slots) AS "Total Slots"
+FROM cd.bookings
+WHERE starttime >= '2012-09-01'
+  AND starttime < '2012-10-01'
+GROUP BY facid
+ORDER BY SUM(slots);
+```
+
+### Example 26: Total slots booked per facility per month in 2012
+```sql
+SELECT facid, 
+       EXTRACT(month FROM starttime) AS month, 
+       SUM(slots) AS "Total Slots"
+FROM cd.bookings
+WHERE starttime >= '2012-01-01'
+  AND starttime < '2013-01-01'
+GROUP BY facid, month
+ORDER BY facid, month;
+```
+
+### Example 27: Count of unique members who made at least one booking
+```sql
+SELECT COUNT(DISTINCT memid) 
+FROM cd.bookings;
+```
+
+### Example 28: Facilities with more than 1000 slots booked (`HAVING`)
+```sql
+SELECT facid, 
+       SUM(slots) AS "Total Slots"
+FROM cd.bookings
+GROUP BY facid
+HAVING SUM(slots) > 1000
+ORDER BY facid;
+```
+
+### Example 29: Facility with the highest number of slots booked (Top-N)
+```sql
+SELECT facid, 
+       SUM(slots) AS "Total Slots"
+FROM cd.bookings
+GROUP BY facid
+ORDER BY SUM(slots) DESC
+LIMIT 1;
 ```
