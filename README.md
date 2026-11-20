@@ -1,6 +1,6 @@
 # 🎯 Road to Data Analyst: SQL Learning Log
 
-Documentation of completed PostgreSQL exercises from [pgexercises.com](https://pgexercises.com).
+Documentation of completed PostgreSQL exercises from [pgexercises.com](https://pgexercises.com) preparing for the End-to-End E-Commerce Data Analytics Project.
 
 ---
 
@@ -25,54 +25,30 @@ Documentation of completed PostgreSQL exercises from [pgexercises.com](https://p
 
 ---
 
-## 📌 2. Joins and Subqueries (3 Completed) 🔄
+## 📌 2. Joins and Subqueries (8 / 8) ✅
 
 | # | Exercise | Core Concept | Status |
 |:---:|:---|:---|:---:|
 | 1 | **Retrieve the start times of members' bookings** | Multi-table `INNER JOIN` with table aliases and composite `WHERE` | ✅ Completed |
 | 2 | **Work out the start times of bookings for tennis courts** | `INNER JOIN` with date-range boundary filtering and `ORDER BY` | ✅ Completed |
 | 3 | **Produce a list of all members who have recommended another member** | Self `JOIN` on hierarchical relation with `DISTINCT` deduplication | ✅ Completed |
-| 4 | Produce a list of all members, along with their recommender | Outer joins (`LEFT JOIN`) | ⚪ Pending |
-| 5 | Produce a list of all members who have used a tennis court | Multi-table join across 3 tables | ⚪ Pending |
-| 6 | Produce a list of costly bookings | Calculated expressions across joins | ⚪ Pending |
-| 7 | Produce a list of all members, along with their recommender, using no joins | Correlated subqueries in `SELECT` list | ⚪ Pending |
-| 8 | Produce a list of costly bookings, using a subquery | CTE / Subquery in `FROM` clause | ⚪ Pending |
+| 4 | **Produce a list of all members, along with their recommender** | `LEFT OUTER JOIN` to preserve unmatched records and handle `NULL`s | ✅ Completed |
+| 5 | **Produce a list of all members who have used a tennis court** | Multi-table join across 3 tables (`members` ⨝ `bookings` ⨝ `facilities`) | ✅ Completed |
+| 6 | **Produce a list of costly bookings** | Multi-table join with dynamic calculations and conditional `CASE WHEN` | ✅ Completed |
+| 7 | **Produce a list of all members, along with their recommender, using no joins** | Scalar correlated subquery in `SELECT` projection list | ✅ Completed |
+| 8 | **Produce a list of costly bookings, using a subquery** | Derived table / Inline subquery in `FROM` clause to avoid DRY duplication | ✅ Completed |
 
 📄 *All SQL queries for this section:* [`sql/joins_and_subqueries.sql`](file:///c:/Users/Test/Desktop/sql/sql/joins_and_subqueries.sql)
 
 ---
 
-## 💻 Query Solutions & Notes: Joins and Subqueries
+## 🚀 Next Steps in Roadmap
 
-### 1. Retrieve the start times of members' bookings
-```sql
-SELECT bks.starttime
-FROM cd.bookings bks
-INNER JOIN cd.members mems
-    ON mems.memid = bks.memid
-WHERE mems.firstname = 'David'
-  AND mems.surname = 'Farrell';
-```
-
-### 2. Work out the start times of bookings for tennis courts
-```sql
-SELECT bks.starttime AS start, 
-       facs.name AS name
-FROM cd.bookings bks
-INNER JOIN cd.facilities facs
-    ON facs.facid = bks.facid
-WHERE facs.name LIKE 'Tennis Court%'
-  AND bks.starttime >= '2012-09-21'
-  AND bks.starttime < '2012-09-22'
-ORDER BY bks.starttime;
-```
-
-### 3. Produce a list of all members who have recommended another member
-```sql
-SELECT DISTINCT recs.firstname, 
-       recs.surname
-FROM cd.members mems
-INNER JOIN cd.members recs
-    ON recs.memid = mems.recommendedby
-ORDER BY surname, firstname;
-```
+1. **Aggregates Section** *(Up Next on pgexercises.com)*:
+   - `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`
+   - `GROUP BY` and `HAVING` clauses
+   - Nested aggregations & window function foundations
+2. **Database Design & Data Loading**:
+   - Create `olist_ecommerce` PostgreSQL database
+   - Relational DDL schema setup with primary/foreign keys
+   - Ingesting Olist Brazilian E-Commerce dataset CSVs via `\copy`
