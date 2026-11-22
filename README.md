@@ -2,10 +2,13 @@
 
 An enterprise-grade, end-to-end data analytics portfolio project examining **~100,000 real-world customer orders** from the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) on Kaggle. 
 
-This repository documents the entire analytics lifecycle: **SQL syntax foundations**, **relational database architecture (PostgreSQL 18)**, **business exploratory data analysis**, **statistical modeling in Python**, and **executive KPI dashboards in Power BI**.
+This repository documents the entire analytics lifecycle: **SQL syntax foundations**, **relational database architecture (PostgreSQL 18)**, **business exploratory data analysis**, **Python (pandas) ETL & data cleaning**, and **executive KPI dashboards in Power BI**.
 
 > 💡 **Looking for all SQL practice queries from the Day 1 syntax refresh?**  
 > Browse the dedicated reference file: **[`SQL_EXAMPLES.md`](file:///c:/Users/Test/Desktop/sql/SQL_EXAMPLES.md)**
+
+> 🐍 **Looking for all Day 4 Python (pandas) scripts and terminal execution outputs?**  
+> Browse the complete walkthrough: **[`PYTHON_EXAMPLES.md`](file:///c:/Users/Test/Desktop/sql/PYTHON_EXAMPLES.md)**
 
 ---
 
@@ -16,8 +19,8 @@ This repository documents the entire analytics lifecycle: **SQL syntax foundatio
 | **Day 1** | **SQL Syntax Refresh** | ✅ **Completed** | Mastered 29 queries across Simple Queries, Joins, and Aggregations on pgexercises.com |
 | **Day 2** | **Database Design & Data Loading** | ✅ **Completed** | PostgreSQL 18 database setup, relational schema, `psql \copy` bulk ingestion, 311,532 rows verified |
 | **Day 3** | **Exploratory SQL & Window Functions** | ✅ **Completed** | Business analysis queries (`LAG()`, CTEs, window functions) & Power BI views (`vw_monthly_sales`, `vw_state_performance`) |
-| **Day 4** | **Python (pandas) Data Cleaning & Stats** | 🔄 **Next Stage** | Jupyter notebook, hypothesis testing (`scipy.stats`), seaborn visualization exports |
-| **Day 5** | **Power BI Data Modeling & DAX** | ⚪ *Planned* | Dimensional Star Schema modeling, core DAX business measures |
+| **Day 4** | **Python (pandas) Data Cleaning & Stats** | ✅ **Completed** | 4 modular Python scripts (step1–step4), datetime cleaning, multi-table pandas merges, and clean CSV exports (`clean_state_summary.csv`, `clean_top_products.csv`) — see [`PYTHON_EXAMPLES.md`](file:///c:/Users/Test/Desktop/sql/PYTHON_EXAMPLES.md) |
+| **Day 5** | **Power BI Data Modeling & DAX** | 🔄 **Next Stage** | Dimensional Star Schema modeling, core DAX business measures |
 | **Day 6** | **Power BI Dashboard Design** | ⚪ *Planned* | Single-page Executive Sales & Logistics Dashboard |
 | **Day 7** | **Executive Presentation & CV Polish** | ⚪ *Planned* | Commercial findings, actionable business storytelling, CV impact metrics |
 
@@ -59,6 +62,33 @@ Engineered two production-ready PostgreSQL views to serve as direct feeds for do
 
 ---
 
+## 🐍 Day 4: Key Python (pandas) EDA & Data Quality Findings
+
+All Python scripts, transformed datasets, and terminal outputs are documented in [`python-eda/`](file:///c:/Users/Test/Desktop/sql/python-eda) and [`PYTHON_EXAMPLES.md`](file:///c:/Users/Test/Desktop/sql/PYTHON_EXAMPLES.md).
+
+### 1. Data Hygiene & Integrity Audit
+- Ingested **99,441 raw order records** across 8 schema attributes.
+- Confirmed **96,478 delivered orders**.
+- **Anomaly Detection:** Flagged an edge-case data quality defect where exactly **8 delivered orders** have `null` timestamps for `order_delivered_customer_date` (leaving 96,470 valid delivery durations calculated).
+
+### 2. Delivery Distribution & Carrier SLA Efficiency
+- **Actual Transit Times:** Delivery duration averages **12.09 days** (median: 10.0 days, IQR: 6.0–15.0 days, max: 209 days).
+- **SLA Buffer:** Orders arrived on average **11.88 days ahead of schedule** (`delay_vs_estimate = -11.88 days`), demonstrating that Olist carriers set conservative customer delivery windows to buffer against transit friction.
+
+### 3. Regional Revenue vs. Transit Speed Correlation
+- Joined orders, order items, and customer geolocation tables into a 110,197-row denormalized dataset.
+- **Speed & Volume Leader:** **São Paulo (SP)** leads national revenue at **R$ 5,067,633.16** across 40,501 orders, benefiting from the fastest fulfillment network in Brazil (**8.3 days avg delivery**).
+- **Logistics Lag:** In contrast, high-potential regions like **Bahia (BA)** average **18.8 days** for delivery, signaling regional courier bottlenecks.
+- Exported clean regional aggregations to [`python-eda/clean_state_summary.csv`](file:///c:/Users/Test/Desktop/sql/python-eda/clean_state_summary.csv) for Power BI visualization.
+
+### 4. Product Revenue Concentration & Pricing Mix
+- Aggregated delivered order items by SKU to evaluate volume vs. margin dynamics:
+  - **High-Ticket / Low-Volume:** Product `d6160fb7873f184099d9bc95e30376af` generated **R$ 45,949.35** across only **33 orders** with an average unit price of **R$ 1,392.40**.
+  - **Low-Ticket / High-Volume:** Product `99a4788cb24856965c36a24e339b6058` generated **R$ 42,049.66** across **477 orders** with an average unit price of **R$ 88.15**.
+- Exported the top 20 revenue-generating SKUs to [`python-eda/clean_top_products.csv`](file:///c:/Users/Test/Desktop/sql/python-eda/clean_top_products.csv).
+
+---
+
 ## 🛠️ Day 2 Implementation Log: Database Design & Data Loading
 
 ### 1. Dataset Acquisition
@@ -85,7 +115,6 @@ Designed and implemented 3 normalized relational tables enforcing referential in
   ERROR: could not open file "..." for reading: Permission denied
   SQL state: 42501
   ```
-  In PostgreSQL on Windows, the background server process (`NETWORK SERVICE` / `postgres`) lacks read permissions to user Desktop/workspace directories.
 - **Resolution**: Bypassed server filesystem restrictions by executing client-side bulk ingestion via `psql \copy` running under the authenticated user session with explicit UTF-8 encoding:
   ```sql
   \copy customers FROM 'data/olist_customers_dataset.csv' DELIMITER ',' CSV HEADER ENCODING 'UTF8';
@@ -119,8 +148,17 @@ SELECT 'order_items', COUNT(*) FROM order_items;
 ecommerce-sql-powerbi-analysis/
 ├── README.md                      # Comprehensive project documentation & daily log
 ├── SQL_EXAMPLES.md                # 29 foundational SQL practice queries (Day 1)
-├── .gitignore                     # Git rules (ignoring large CSVs, archives, pycache)
-└── sql/
+├── PYTHON_EXAMPLES.md             # Day 4 Python (pandas) walkthrough & outputs
+├── .gitignore                     # Git rules (ignoring raw CSVs, archives, pycache)
+├── python-eda/                    # Day 4 Python scripts and clean CSV outputs
+│   ├── requirements.txt           # Python dependencies (pandas)
+│   ├── step1_load.py              # Ingestion & schema inspection
+│   ├── step2_clean_dates.py       # Datetime conversion & SLA audit
+│   ├── step3_merge_groupby.py     # Multi-table merge & state aggregation
+│   ├── step4_top_products.py      # Product revenue mix analysis
+│   ├── clean_state_summary.csv    # Clean regional dataset for Power BI
+│   └── clean_top_products.csv     # Clean top products dataset for Power BI
+└── sql/                           # Day 1–3 PostgreSQL scripts
     ├── 01_schema_and_load.sql     # Day 2: DDL schema, \copy ingestion & row verification
     ├── 02_business_analysis.sql   # Day 3: EDA queries, window functions & Power BI views
     ├── simple_sql_queries.sql     # Day 1: 12 simple SQL queries
@@ -130,8 +168,7 @@ ecommerce-sql-powerbi-analysis/
 
 ---
 
-## 🚀 Upcoming Milestone: Day 4 — Python (pandas) Data Cleaning & Stats
-- Connect Python directly to PostgreSQL using `psycopg2` / `sqlalchemy` and `pandas.read_sql()`.
-- Validate data types, evaluate missing records, and generate descriptive statistical summaries.
-- Run statistical hypothesis testing using `scipy.stats` (testing whether delivery delays statistically lower customer review ratings).
-- Export 2–3 publication-ready Seaborn/Matplotlib visualization charts.
+## 🚀 Upcoming Milestone: Day 5 — Power BI Data Modeling & DAX
+- Ingest `clean_state_summary.csv` and `clean_top_products.csv` (or connect to PostgreSQL views).
+- Build Star Schema relationships between Fact and Dimension entities.
+- Write core DAX measures (`Total Revenue`, `Total Orders`, `Average Order Value`, `Late Delivery %`).

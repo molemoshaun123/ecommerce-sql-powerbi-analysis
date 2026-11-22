@@ -1,7 +1,7 @@
-# Large Dataset Files (Olist CSVs & Archives)
+# Large Raw Dataset Files (Olist CSVs & Archives)
+olist_*.csv
 data/*.csv
 data/*.zip
-*.csv
 *.zip
 
 # Environment & Secrets
